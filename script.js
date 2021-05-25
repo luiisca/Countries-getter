@@ -29,7 +29,7 @@ const showError = function (error) {
   );
   countriesContainer.style.opacity = 1;
 };
-const fetchData = function (url, errMsg = 'Something went wrong') {
+const verifyError = function (url, errMsg = 'Something went wrong') {
   return fetch(url).then(response => {
     //what if i dont return?
     if (!response.ok) {
@@ -65,16 +65,17 @@ const fetchData = function (url, errMsg = 'Something went wrong') {
 // };
 
 const getCountry = function (country) {
-  fetchData(
+  verifyError(
     `https://restcountries.eu/rest/v2/name/${country}`,
-    'Contry not found'
-  )
+    'Country not found'
+  ) //what happens if this returns a rejected promise? ignore then and goes directly for catch
     .then(response => {
       renderCountry(response[0]);
-      // const neighbour = response[0].borders[0];
-      const neighbour = 'dfjdfd';
-      if (!neighbour) return;
-      return fetchData(
+      const neighbour = response[0].borders[0];
+      // if (!neighbour) return;
+      if (!neighbour)
+        throw new Error(`There is no neighbours for ${response[0].name}`); //why we do this? create error messages where it could be errors and make the user know what was wrong.
+      return verifyError(
         `https://restcountries.eu/rest/v2/alpha/${neighbour}`,
         'Country not found'
       );
@@ -83,9 +84,9 @@ const getCountry = function (country) {
     .catch(err => showError(err));
 };
 
-btn.addEventListener('click', function () {
-  getCountry('peru');
-});
+// btn.addEventListener('click', function () {
+//   getCountry('australia');
+// });
 // getCountry('chile');
 // getCountry('argentina');
 // getCountry('usa');
@@ -99,3 +100,32 @@ btn.addEventListener('click', function () {
 // getCountry('china');
 // getCountry('italy');
 // getCountry('spain');
+
+const whereAmI = function (lat, long) {
+  fetch(`https://geocode.xyz/${lat},${long}?geoit=json`)
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`You can only make 3 requests at a time (403)`);
+      return response.json();
+    })
+    .then(data => {
+      if (data.matches === null)
+        throw new Error(`Your coordinates doesn't match any country(404)`);
+
+      console.log(`You are in ${data.city}, ${data.country}`);
+
+      return fetch(`https://restcountries.eu/rest/v2/name/${data.country}`);
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (!data[0])
+        throw new Error(`Your coordinates doesn't match any country(404)`);
+      return renderCountry(data[0]);
+    })
+    .catch(err => showError(err));
+};
+btn.addEventListener('click', function () {
+  whereAmI(52.508, 13.381);
+  whereAmI(19.037, 72.873);
+  whereAmI(-33.933, 18.474);
+});
