@@ -22,12 +22,21 @@ const renderCountry = function (country, className = '') {
   countriesContainer.insertAdjacentHTML('beforeend', html);
   countriesContainer.style.opacity = 1;
 };
-const getError = function (error) {
+const showError = function (error) {
   countriesContainer.insertAdjacentText(
     'afterbegin',
     `Something went wrong, ${error.message}. Please try it again.`
   );
   countriesContainer.style.opacity = 1;
+};
+const fetchData = function (url, errMsg = 'Something went wrong') {
+  return fetch(url).then(response => {
+    //what if i dont return?
+    if (!response.ok) {
+      throw new Error(`${errMsg} (${response.status})`); //explain the process
+    }
+    return response.json(); //why is necessary use return
+  });
 };
 
 // const getCountry = function (country) {
@@ -56,34 +65,26 @@ const getError = function (error) {
 // };
 
 const getCountry = function (country) {
-  const request2 = fetch(`https://restcountries.eu/rest/v2/name/${country}`);
-  request2
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Country not found (${response.status})`); //explain the process
-      }
-      return response.json(); //why is necessary use return
-    })
+  fetchData(
+    `https://restcountries.eu/rest/v2/name/${country}`,
+    'Contry not found'
+  )
     .then(response => {
       renderCountry(response[0]);
       // const neighbour = response[0].borders[0];
       const neighbour = 'dfjdfd';
       if (!neighbour) return;
-      return fetch(`https://restcountries.eu/rest/v2/alpha/${neighbour}`);
-    })
-    .then(response => {
-      console.log(response);
-      if (!response.ok) {
-        throw new Error(`Country net found (${response.status})`);
-      } //how works errors chain -- the first error attached is showed
-      return response.json();
+      return fetchData(
+        `https://restcountries.eu/rest/v2/alpha/${neighbour}`,
+        'Country not found'
+      );
     })
     .then(response => renderCountry(response, 'neighbour'))
-    .catch(err => getError(err));
+    .catch(err => showError(err));
 };
 
 btn.addEventListener('click', function () {
-  getCountry('peru24');
+  getCountry('peru');
 });
 // getCountry('chile');
 // getCountry('argentina');
