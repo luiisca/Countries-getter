@@ -3,6 +3,20 @@ import Country, { getCountryData, renderClient as render } from './components/co
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 
+class App {
+  constructor() {
+    this._updateHistory()
+  }
+
+  _updateHistory() {
+    if (USER_COUNTRY) {
+      window.history.pushState({}, "", `?country=${USER_COUNTRY}`);
+    }
+  }
+}
+
+new App();
+
 // btn.addEventListener('click', function() {
 //   countriesContainer.innerHTML = ''; // Clear previous results
 //   getCountryData(USER_COUNTRY);
