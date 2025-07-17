@@ -55,11 +55,15 @@ export default {
             `
             let neighbour;
             if (borders.length > 0) {
-              neighbour = await getCountryData(borders[0]);
-              if (typeof neighbour !== 'string') {
-                template += `
-                  ${Country(neighbour, 'neighbour')}
-                `;
+              for (let index = 0; index < borders.length; index++) {
+                const border = borders[index];
+                neighbour = await getCountryData(border);
+
+                if (typeof neighbour !== 'string') {
+                  template += `
+                    ${Country(neighbour, 'neighbour')}
+                  `;
+                }
               }
             }
 
