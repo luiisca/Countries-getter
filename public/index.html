@@ -15,8 +15,10 @@
   <main class="container">
     <div class="countries"></div>
     <div class="selector-container">
-      <select id="country-selector"></select>
-      <button id="go-btn">Go</button>
+      <form action="/" method="GET">
+        <select id="country-selector" name="country" onchange="this.form.submit()"></select>
+        <button type="submit" id="go-btn" class="btn-country">Go</button>
+      </form>
     </div>
     <div class="images"></div>
   </main>

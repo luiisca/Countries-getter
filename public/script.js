@@ -1,11 +1,8 @@
-import Country, { getCountryData, renderClient as render } from './components/country.js';
-
-const btn = document.querySelector('.btn-country');
-const countriesContainer = document.querySelector('.countries');
-
 class App {
   constructor() {
-    this._updateHistory()
+    this._updateHistory();
+
+    document.querySelector('.countries')?.addEventListener('click', this._handleCountryClick.bind(this));
   }
 
   _updateHistory() {
@@ -13,36 +10,19 @@ class App {
       window.history.pushState({}, "", `?country=${USER_COUNTRY}`);
     }
   }
+
+  /**
+   * @param {Event} ev
+   */
+  _handleCountryClick(ev) {
+    const countryCard = ev.target.closest('.country');
+    if (!countryCard) return;
+
+    const countryName = countryCard.id;
+    if (countryName) {
+      window.location.href = `/?country=${countryName}`;
+    }
+  }
 }
 
 new App();
-
-// btn.addEventListener('click', function() {
-//   countriesContainer.innerHTML = ''; // Clear previous results
-//   getCountryData(USER_COUNTRY);
-// });
-
-// (async function App() {
-//   if (!USER_COUNTRY) {
-//     return;
-//   }
-//
-//   const data = await getCountryData(USER_COUNTRY)
-//   if (typeof data === 'string') {
-//     return render(countriesContainer, data);
-//   }
-//
-//   const borders = data.borders || [];
-//   let template = `
-//     ${Country(data)} 
-//   `
-//   let neighbour;
-//   if (borders.length > 0) {
-//     neighbour = await getCountryData(borders[0]);
-//     template += `
-//       ${Country(neighbour, 'neighbour')}
-//     `;
-//   }
-//
-//   render(countriesContainer, template);
-// })()

@@ -37,6 +37,7 @@ body {
 }
 
 .country {
+  cursor: pointer;
   background-color: #fff;
   box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
   font-size: 1.8rem;
@@ -125,4 +126,30 @@ body {
   margin: 2rem;
   border: 3rem solid white;
   box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.selector-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+#country-selector {
+  font-size: 1.8rem;
+  padding: 1.5rem 2rem;
+  border-radius: 0.7rem;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+#go-btn {
+  padding: 1.5rem 3rem;
+}
+
+.hidden {
+  display: none;
 }

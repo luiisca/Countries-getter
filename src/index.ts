@@ -11,7 +11,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import Country, { getCountryData } from '../public/components/country.js';
+import Country, { getCountriesData, getCountryData } from '../public/components/country.js';
 
 function render(container: Element, template: string) {
   container.append(template, { html: true })
@@ -24,48 +24,80 @@ export default {
     const url = new URL(request.url);
     const countryParam = url.searchParams.get('country')
 
-    let country: string | null;
+    let rewriter = new HTMLRewriter();
+    let countryCode: string | null;
+    let useCode = true;
     if (countryParam) {
-      country = countryParam;
+      countryCode = countryParam;
+      useCode = false;
     } else {
-      country = request.cf?.country as string | null;
+      countryCode = request.cf?.country as string | null;
+      useCode = true
+    }
+    if (countryCode) {
+      const countryData = await getCountryData(countryCode, useCode)
+
+      rewriter
+        .on('div.countries', {
+          async element(el) {
+            if (!countryCode) {
+              return render(el, 'Please select a country');
+            }
+
+            if (typeof countryData === 'string') {
+              const error = countryData;
+              return render(el, error);
+            }
+
+            const borders = countryData.borders || [];
+            let template = `
+              ${Country(countryData, '')} 
+            `
+            let neighbour;
+            if (borders.length > 0) {
+              neighbour = await getCountryData(borders[0]);
+              if (typeof neighbour !== 'string') {
+                template += `
+                  ${Country(neighbour, 'neighbour')}
+                `;
+              }
+            }
+
+            render(el, template);
+          }
+        })
+        .on('script#global-vars', {
+          element(el) {
+            if (typeof countryData === 'string') {
+              return;
+            }
+
+            el.setInnerContent(`const USER_COUNTRY = "${countryData.name.official}";`)
+          }
+        })
     }
 
-    const response = await env.ASSETS.fetch(request)
-
-    return new HTMLRewriter()
-      .on('script#global-vars', {
-        element(el) {
-          const id = Object.fromEntries([...el.attributes]).id
-          el.setInnerContent(`const USER_COUNTRY = "${country}";`)
-        }
-      })
-      .on('div.countries', {
+    rewriter
+      .on('select#country-selector', {
         async element(el) {
-          if (!country) {
-            return render(el, 'Please select a country');
+          const countries = await getCountriesData();
+          if (typeof countries === 'string') {
+            const error = countries;
+            return render(el, error);
           }
 
-          const data = await getCountryData(country)
-          if (typeof data === 'string') {
-            return render(el, data);
-          }
-
-          const borders = data.borders || [];
-          let template = `
-            ${Country(data)} 
-          `
-          let neighbour;
-          if (borders.length > 0) {
-            neighbour = await getCountryData(borders[0]);
+          let template = '';
+          countries.forEach(country => {
+            const selected = country.name.official === countryParam ? 'selected' : '';
             template += `
-              ${Country(neighbour, 'neighbour')}
+              <option value="${country.name.official}" ${selected}>${country.name.common}</option>
             `;
-          }
+          });
 
           render(el, template);
         }
       })
-      .transform(response)
+
+    return rewriter.transform(await env.ASSETS.fetch(request));
   },
 } satisfies ExportedHandler<Env>;
