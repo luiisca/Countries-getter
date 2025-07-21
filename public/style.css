@@ -27,7 +27,7 @@ body {
 }
 
 .countries {
-  /* margin-bottom: 8rem; */
+  padding-top: 48px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -101,16 +101,6 @@ body {
   font-size: 2.4rem;
 }
 
-.btn-country {
-  border: none;
-  font-size: 2rem;
-  padding: 2rem 5rem;
-  border-radius: 0.7rem;
-  color: white;
-  background-color: orangered;
-  cursor: pointer;
-}
-
 .images {
   display: flex;
 }
@@ -128,26 +118,45 @@ body {
   box-shadow: 0 2rem 5rem 1rem rgba(0, 0, 0, 0.1);
 }
 
+.selector-form {
+  margin: 2rem;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+}
+
 .selector-container {
   display: flex;
-  gap: 1rem;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-right: 2rem;
 }
 
 #country-selector {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   font-size: 1.8rem;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 4rem 1.5rem 2rem;
   border-radius: 0.7rem;
   border: 1px solid #ccc;
   background-color: #fff;
   font-family: inherit;
   color: inherit;
   cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
 }
 
-#go-btn {
+.go-btn {
   padding: 1.5rem 3rem;
+  border: none;
+  font-size: 2rem;
+  border-radius: 0.7rem;
+  color: white;
+  background-color: orangered;
+  cursor: pointer;
 }
 
 .hidden {
